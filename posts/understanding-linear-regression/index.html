@@ -1,0 +1,104 @@
+<!-- This is an automatically generated file, do not edit it directly -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Understanding Linear Regression</title>
+  <meta charset="UTF-8">
+  
+  <!-- SEO -->
+  <meta name="author" content="Lorenzo Battistela">
+  <meta name="description" content="Understanding linear regression principles and math.">
+  <meta property="og:title" content="Understanding Linear Regression">
+  <meta property="og:description" content="Understanding linear regression principles and math.">
+  <meta property="og:site_name" content="Lorenzo">
+  <meta property="og:url" content="https://lorenzobattistela.github.io//posts/understanding-linear-regression">
+  <meta property="og:image" content="https://lorenzobattistela.github.io//card.jpg"/>
+  <meta property="og:type" content="Website"/>
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="627" />
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="Lorenzo">
+  <meta name="twitter:creator" content="Lorenzo Battistela">
+  <meta name="twitter:title" content="Understanding Linear Regression">
+  <meta name="twitter:description" content="Understanding linear regression principles and math.">
+  <meta name="twitter:image:src" content="https://lorenzobattistela.github.io//card.jpg">
+  <!--  -->
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="Content-Language" content="en">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="generator" content="1POST" />
+  <link rel="icon" href="../../favicon.png">
+  <link href="https://unpkg.com/plume-css@1.0.13/lib/plume-all.css" rel="stylesheet" rel="preload" as="style" media="all" defer>
+  <link rel="stylesheet" href="https://unpkg.com/1post@1.0.3/themes/sweet-carnival.css">
+  <link href="https://unpkg.com/prismjs@1.28.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+  <style>
+    :root {
+      --pm-paragraph-font-size: 1.2em
+    }
+
+    .plume .pm-link, .plume a {
+      font-size: var(--pm-paragraph-font-size);
+    }
+  </style>  
+</head>
+<body class="plume">
+  <div class="pm-container">
+    <h1>Understanding Linear Regression</h1>
+
+    <p>
+      <a href="../..">← ← ←</a> &nbsp; 
+      5/16/2024, 4:48:56 PM | <strong>Posted by:</strong>
+      <a href="https://github.com/Lorenzobattistela" target="_blank" rel="noreferrer noopener">Lorenzo Battistela</a>
+    </p>
+
+    <hr>
+
+    
+
+<h1 id="understanding-linear-regression">Understanding Linear Regression</h1>
+<p>4 min read</p>
+<p>Linear regression is such a common subject when learning data science, and it is a good starting point for most beginners to build a model. In general, most people use libraries like Tensorflow to get this done, but today we are going to understand step by step how does Linear Regression work. Dont get me wrong, this libraries are really useful. But doing it from scratch teaches us a lot more than we think (even if our linear regression performance is worse than the Tensorflow one). Lets dive into it now!</p>
+<p>What is Linear Regression? Well, basically it is a linear approach for modelling the relationship between a scalar response and one or more explanatory variables. For today, we will only look into simple linear regression, that is, when we have only one explanatory variable (or independent).</p>
+<p>The relationship is modeled using linear predictor functions, and model parameters are estimated from the data (which makes it a linear model).</p>
+<p>Linear regression focuses on conditional probability distribution of the response given the values of predictors (given two jointly distributed random variables X and Y, conditional probability distribution of Y given X is the probability of Y when X is known its value).</p>
+<p>Therefore, a a model using linear regression assumes that the relationship between dependent and independent variable is <strong>linear</strong>. We say there is a regression relationship between X and Y when the mean of Y varies with X.</p>
+<p>A simple way to think about this is height and weight. Consider a relationship between height (Y) and weight (X) of a group of people. Lets say that the mean height at a given height is</p>
+<p><code>p(x) = 3x / 5 - 38</code></p>
+<p>for all x &gt; 110.</p>
+<p>The difference between an observed weight (real one) and mean weight at a given height provided by our formula is referred to as the error for that weight.</p>
+<p>Therefore, we can said that the equation for linear regression is:</p>
+<p><img src="./equation1.webp" alt="equation linreg"></p>
+<p>where y is (in our example) the height of some individual, alpha is some parameter (represented in this case by negative 38 minus error), beta is another parameter (represented by 3/5) and the error (minus 38 minus alpha).</p>
+<p>That said, to discover our linear relationship, we could measure the height of three individuals at each weight and apply linear regression to model the mean height as a function of weight using a straight line. The most popular way to estimate parameters is the least-squares estimator (LSE). Before understanding this, remember your high school math classes. In this equation, beta is the slope of the line, and alpha plus error is the interception point. Now lets continue with LSE.</p>
+<p>The method of least squares estimates the solution of our equations by minimizing the sum of the squares of the residuals (where the residual is the difference between observed value and fitted value provided by model) made in the results of each individual equation.</p>
+<p>The estimates are given by:</p>
+<p><img src="./equation2.webp" alt="Figure 2"></p>
+<p>Where</p>
+<p><img src="./equation3.webp" alt="Figure 3"></p>
+<p>The above equation are the points on the estimated regression line (called the fitted ones, or predicted). The estimates are given by:</p>
+<p><img src="./equation4.webp" alt="Figure 4"> <br><img src="./equation5.webp" alt="Figure 5"></p>
+<p>Where X and Y are means of samples x and y, and sx, sy are their standard deviation values, and r is their correlation coefficient.</p>
+<p>LSE is really common because it is good for general error distributions, and this means that when we pick a random Y value from the conditional distribution Y|X, the LSEs will not be too high or too low (although they might deviate from the real values). However, this approach is sensitive to extreme values, or outliers from both sides. This means we have to clean outliers or evaluate them before applying LSE.</p>
+<p>If you want to understand how this happens in code, I highly recommend taking a look on this repository:</p>
+<p><a href="https://github.com/Lorenzobattistela/linear-regression?source=post_page-----d252ed669e90--------------------------------">GitHub - Lorenzobattistela/linear-regression</a></p>
+<p>Here, I build a simple linear regression model from scratch, building all helpers and math functions needed for it to work. More instructions on how to run it on repository README.</p>
+<p>Linear regression is a good way to start studying models and understanding the math behind it. It does not finish on simple LR, since we can have multivariable models. That said, that is a lot to explore and understand about it, and best part is that is easier to do by yourself!</p>
+<p>Thanks for reading this article.</p>
+<p>Best regards, Lorenzo.</p>
+<p>References:</p>
+<p>Altman, N., Krzywinski, M. Simple linear regression. <em>Nat Methods</em> <strong>12</strong>, 999–1000 (2015).</p>
+<p><a href="https://en.wikipedia.org/wiki/Simple_linear_regression">https://en.wikipedia.org/wiki/Simple_linear_regression</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Linear_regression">https://en.wikipedia.org/wiki/Linear_regression</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Linear_least_squares">https://en.wikipedia.org/wiki/Linear_least_squares</a></p>
+<p><a href="https://github.com/Lorenzobattistela/linear-regression">https://github.com/Lorenzobattistela/linear-regression</a></p>
+
+
+  </div>
+
+  <!-- Prism Code Highlighting -->
+  <script src="https://unpkg.com/prismjs@1.28.0/components/prism-core.min.js"></script>
+	<script src="https://unpkg.com/prismjs@1.28.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>
