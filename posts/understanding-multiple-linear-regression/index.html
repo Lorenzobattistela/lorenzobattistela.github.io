@@ -1,0 +1,116 @@
+<!-- This is an automatically generated file, do not edit it directly -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Understanding multiple linear regression</title>
+  <meta charset="UTF-8">
+  
+  <!-- SEO -->
+  <meta name="author" content="Lorenzo Battistela">
+  <meta name="description" content="Multiple linear regression. What it is and its uses.">
+  <meta property="og:title" content="Understanding multiple linear regression">
+  <meta property="og:description" content="Multiple linear regression. What it is and its uses.">
+  <meta property="og:site_name" content="Lorenzo">
+  <meta property="og:url" content="https://lorenzobattistela.github.io//posts/understanding-multiple-linear-regression">
+  <meta property="og:image" content="https://lorenzobattistela.github.io//card.jpg"/>
+  <meta property="og:type" content="Website"/>
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="627" />
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="Lorenzo">
+  <meta name="twitter:creator" content="Lorenzo Battistela">
+  <meta name="twitter:title" content="Understanding multiple linear regression">
+  <meta name="twitter:description" content="Multiple linear regression. What it is and its uses.">
+  <meta name="twitter:image:src" content="https://lorenzobattistela.github.io//card.jpg">
+  <!--  -->
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="Content-Language" content="en">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="generator" content="1POST" />
+  <link rel="icon" href="../../favicon.png">
+  <link href="https://unpkg.com/plume-css@1.0.13/lib/plume-all.css" rel="stylesheet" rel="preload" as="style" media="all" defer>
+  <link rel="stylesheet" href="https://unpkg.com/1post@1.0.3/themes/sweet-carnival.css">
+  <link href="https://unpkg.com/prismjs@1.28.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+  <style>
+    :root {
+      --pm-paragraph-font-size: 1.2em
+    }
+
+    .plume .pm-link, .plume a {
+      font-size: var(--pm-paragraph-font-size);
+    }
+  </style>  
+</head>
+<body class="plume">
+  <div class="pm-container">
+    <h1>Understanding multiple linear regression</h1>
+
+    <p>
+      <a href="../..">← ← ←</a> &nbsp; 
+      5/17/2024, 5:56:45 PM | <strong>Posted by:</strong>
+      <a href="https://github.com/Lorenzobattistela" target="_blank" rel="noreferrer noopener">Lorenzo Battistela</a>
+    </p>
+
+    <hr>
+
+    
+
+<p>5 min read</p>
+<p>On my previous article about linear regression, I defined it as a linear approach for modelling the relationship between a scalar response and one or more explanatory variables, and focused and models with one explanatory variable. Today, we are going to talk about multiple linear regression, which is still linear regression but with two or more predictors.</p>
+<p>Suppose you are the manager of a company, and you want to understand how the marketing of your products affects the number of sold products. Lets say you have Instagram divulgation, Facebook ads and Google ads. They can affect product selling in different ways, and if we apply simple linear regression here fixing Facebook ads, for example, the result would be inaccurate because we would not consider other influences.</p>
+<p>That said, we extend our simple linear regression model to support more than on explanatory variable. Mathematically speaking, we have:</p>
+<p><img src="equation1.webp" alt="equation1"></p>
+<p>Where <em>y</em> is the output value, the <em>X</em> terms are input variables (explanatory), and each predictor (x) has a slope coefficient (B).</p>
+<p>Taking it to our example, we can say that:</p>
+<pre><code>Products sold = B0 + B1 \* Instagram + B2 \* Facebook + B3 \* Google
+</code></pre>
+<p>The model would find the slope constants minimizing error function and fitting the best line. Again, we use Residual Sum of Squares (OLS):</p>
+<p><img src="equation2.webp" alt="equation2"></p>
+<p>Suppose that we have a real dataset on the example above, and that we ran our Linear Regression model:</p>
+<pre><code>Products sold = 1.92123 + 0.15021 \* Instagram + 0.05121 \* Facebook - 0.00123 \* Google
+</code></pre>
+<p>This means that if we fix the budget for Facebook and Google, increasing Instagram budget on advertisement by $1000 will increase our product sales by around 150 units (0.150 * 1000). We also see that Facebook is not affecting sold products.</p>
+<p>But if we run Simple linear regression on Facebook, it would probably output a higher value (suppose 0.066), which would influence sales. Lets understand collinearity.</p>
+<p>Collinearity is defined as a linear relationship between two explanatory variables. This means that, if we have perfect collinearity (C(y1, y2) = 1), the slope (B) of this variables is the same for all observations, which means they are perfectly linearly related.</p>
+<p>Practically speaking, this means that a variable can influence another, they can be related linearly. For our example, suppose we measured the correlation between facebook and google, and the result was 0.40</p>
+<p>This indicates a fair relationship between the two measures, and we can infer that when we facebook budget increase sold products, there is a tendency to google to increase it as well. This is why a simple linear regression will show impact on sales, because if we ran SLR, we would have only one value but the impact of both would be counted.</p>
+<p>We also have to think is wether or not our predictors are useful in predicting the output. This is where forming Hypothesis come. The model we were discussing had numbers that were able to establish a close enough linear relationship, but this can be an accident and we did not prove the credibility of that relationship. So, we do a Hypothesis Test.</p>
+<p>Lets start by forming a Null Hypothesis and an Alternative one. The Null hypothesis is that all coeficients (B) are equal to 0. The alternative is that at least one of the coefficients is not zero.</p>
+<p>For this, we will use F-statistic (known as fixation indices). I will not cover it in this article, but if the value of it is equal to or very close to 1, results are in favor of Null Hypothesis. Note that F-statistic is not suitable when number of predictors is large or if you have more predictors than data samples.</p>
+<p>So, we can try every combination of variables in our case (since we have only 3), and perform feature selection using different approaches, such as Forward or Backward selection.</p>
+<p>Forward selection: start with a model without any predictor, but with the interceptor (B0). Perform linear regression for each predictor to find best performer (low residual sum of squares). Then, we add another variable and check vor the best 2 variable combination for lower RSS. We perform this step untill a stopping rule is statisfied (maybe 4 variable combination or other condition, is up to you).</p>
+<p>Backward selection: start with all variables in the model and remove the least statistically significant . This is repeated untill a stopping rule is reached or when the model score cannot be improved.</p>
+<h1 id="linear-regression-assumptions">Linear Regression Assumptions</h1>
+<p>When performing linear regression, we assume some thing about our data.</p>
+<ul>
+<li>The response variable is continuous and the explanatory variables are either continuous or binary</li>
+<li>The relationship between outcome and explanatory variables is linear</li>
+<li>Residuals are homoschedastic</li>
+<li>Residuals are normally distributed</li>
+<li>There is no more than limited multicollinearity</li>
+<li>There are no other external variables</li>
+<li>Independent errors</li>
+<li>Independent Observations</li>
+</ul>
+<p>If those assumptions are proven to not be true, this does not mean that the model is unusable, but there will be limitations.</p>
+<h1 id="extreme-values">Extreme Values</h1>
+<p>Sometimes, when analysing regression, it is useful to remove outliers from data before refining model. It will have huge effects on coefficients (B), because the LSS method minimises squared error terms, and this can move the line if we have extreme values. When an outlier has this influence, it is described as having leverage on our regression line.</p>
+<p>We can measure this using Cooks distance, which is a measure of the change in predicted values if an observation x is removed. Any value with a distance larger than three times the mean of Cooks distance might be an outlier.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Thanks for reading this! Hope it helps.</p>
+<p>This article was written with the unique purpose of studying and passing on knowledge. I have used other articles to study and will reference them in References section.</p>
+<h1 id="references">References</h1>
+<p><a href="https://towardsdatascience.com/multiple-linear-regression-8cf3bee21d8b?source=post_page-----ec4a04d7b4ed--------------------------------">Multiple Linear Regression</a></p>
+<p><a href="https://blog.minitab.com/en/adventures-in-statistics-2/what-is-the-difference-between-linear-and-nonlinear-equations-in-regression-analysis?source=post_page-----ec4a04d7b4ed--------------------------------">What is the difference between linear and nonlinear equations</a></p>
+<p><a href="https://www.scribbr.com/statistics/multiple-linear-regression/?source=post_page-----ec4a04d7b4ed--------------------------------">Multiple Linear Regression | A Quick Guide (Examples)</a></p>
+
+
+  </div>
+
+  <!-- Prism Code Highlighting -->
+  <script src="https://unpkg.com/prismjs@1.28.0/components/prism-core.min.js"></script>
+	<script src="https://unpkg.com/prismjs@1.28.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>
