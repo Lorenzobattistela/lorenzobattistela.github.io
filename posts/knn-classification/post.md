@@ -1,6 +1,6 @@
 <!--:::{
   "post_title": "What is K-Nearest-Neighbors classification?",
-  "post_description": "KNN classificatoion algorithm",
+  "post_description": "KNN classification algorithm",
   "post_created_at": "Sun May 19 2024 08:32:10 GMT-0300 (Brasilia Standard Time)"
 }:::-->
 
