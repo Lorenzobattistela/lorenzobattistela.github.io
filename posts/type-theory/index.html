@@ -1,0 +1,176 @@
+<!-- This is an automatically generated file, do not edit it directly -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Type Theory 101</title>
+  <meta charset="UTF-8">
+  
+  <!-- SEO -->
+  <meta name="author" content="Lorenzo Battistela">
+  <meta name="description" content="Basics of TT">
+  <meta property="og:title" content="Type Theory 101">
+  <meta property="og:description" content="Basics of TT">
+  <meta property="og:site_name" content="Lorenzo">
+  <meta property="og:url" content="https://lorenzobattistela.github.io//posts/type-theory">
+  <meta property="og:image" content="https://lorenzobattistela.github.io//card.jpg"/>
+  <meta property="og:type" content="Website"/>
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="627" />
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="Lorenzo">
+  <meta name="twitter:creator" content="Lorenzo Battistela">
+  <meta name="twitter:title" content="Type Theory 101">
+  <meta name="twitter:description" content="Basics of TT">
+  <meta name="twitter:image:src" content="https://lorenzobattistela.github.io//card.jpg">
+  <!--  -->
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="Content-Language" content="en">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="generator" content="1POST" />
+  <link rel="icon" href="../../l_favicon.png">
+  <link href="https://unpkg.com/plume-css@1.0.13/lib/plume-all.css" rel="stylesheet" rel="preload" as="style" media="all" defer>
+  <link rel="stylesheet" href="https://unpkg.com/1post@1.0.3/themes/sweet-carnival.css">
+  <link href="https://unpkg.com/prismjs@1.28.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+  <style>
+    :root {
+      --pm-paragraph-font-size: 1.2em
+    }
+
+    .plume .pm-link, .plume a {
+      font-size: var(--pm-paragraph-font-size);
+    }
+  </style>  
+</head>
+<body class="plume">
+  <div class="pm-container">
+    <h1>Type Theory 101</h1>
+
+    <p>
+      <a href="../..">← ← ←</a> &nbsp; 
+      5/21/2024, 4:27:43 PM | <strong>Posted by:</strong>
+      <a href="https://github.com/Lorenzobattistela" target="_blank" rel="noreferrer noopener">Lorenzo Battistela</a>
+    </p>
+
+    <hr>
+
+    
+
+<p>9 min read</p>
+<p>A few months ago, I had contact with some really interesting open source projects. Compilers, languages, runtimes, mostly low level stuff I had little to no contact before. So I decided to dive in, and started studying. I ended up discovering a whole new world of theories, proofs and research.</p>
+<p>But I felt I did not know the basics, the fundamentals of it — mainly because when trying to read an article, I even had trouble understanding the notation.</p>
+<p>Have you ever seen something like this?</p>
+<p><img src="./1.webp" alt="typing rule"></p>
+<p>It really seems complicated, but it is no monster. Let’s learn how to read this and what is type theory.</p>
+<hr>
+<h2 id="a-little-bit-of-history">A little bit of history</h2>
+<p>We all know what a paradox is. Sometimes we hear some fun ones that make us think, such as the <a href="https://en.wikipedia.org/wiki/Twin_paradox">Twin Paradox.</a> What happens is that physics and math are sources of many paradoxes. One of them is Russell’s paradox, which is a set-theoretic paradox that shows that every set theory that contains an unrestricted comprehension principle leads to contradictions. Basically, for any property, there is a set of all and only the objects that have that property. Then we have a set R that is the set of all sets that are not member of themselves. If R is not a member of itself, then its definition entails that it is a member of itself. Otherwise, if it is a member of itself, then it is not a member of itself since this is the set of all the sets that are not members of themselves.</p>
+<p>Well that is confusing, but read it slowly and understand the problem here.</p>
+<p>Type theory was created with the goal of avoiding paradoxes in a math equation based on set theory and formal logic. After that, we had progress on type theory such as ramified type theory together with an axiom of reducibility.</p>
+<p>We also have Alonzo Church into play with his Lambda Calculus — which is the most popular conjunction of type theory. Church demonstrated it as a foundation of mathematics — a higher-order logic.</p>
+<p>In modern literature, type theory usually refers to a typed system based on lambda calculus. Influential systems worth mentioning is Martin-Lofs intuitionistic type theory and Thierry Coquands calculus of constructions.</p>
+<hr>
+<h2 id="introducing-type-theory">Introducing Type Theory</h2>
+<p>As the name states, in type theory, the basic object of study is a type. I am sure you are familiar with some types. For example, natural number is a type, usually denoted <code>nat</code> . Integer is also a type. <code>=</code> is a type called the identity type.</p>
+<p>Types can have terms (or terms can have types?). For example, 1 is a term of type <code>nat</code> , and we can declare it as <code>1 : nat</code> . This is a type declaration. This may sound familiar if you have experience with statically typed programming languages like Rust.</p>
+<p>We also have a special type called <code>Type</code> . As you may imagine, it is used to define the type of a type. So, for example, <code>nat : Type</code> is a valid declaration.</p>
+<p>Type theory is a subject that grows along with more fields, (such as category theory and proof theory) and we can have multiple interpretations for types. Here are some of them:</p>
+<ul>
+<li>A type is a set, and a term is an element of this set</li>
+<li>A type is a space, and a term is a point in this space</li>
+<li>A type is a proposition, and a term is a proof of this proposition</li>
+</ul>
+<p>Let’s introduce judgements, and a new symbol: <code>⊢</code></p>
+<p>How do we read the following judgement?</p>
+<p><code>⊢ A : Type</code></p>
+<p>We can read this as: A is of type Type. This is a simple judgement.</p>
+<p>Another symbol is used to represent Context: Γ (Gamma).</p>
+<p>Γ is a finite sequence of type declarations, aka context. Intuitively, this mean that the assumptions in the left-hand context imply the right-hand side.</p>
+<p><code>Γ ⊢ A : Type</code></p>
+<p>We read this as: Under context gamma, A is of type Type</p>
+<p>What about the following?</p>
+<p><code>Γ ⊢ A === B : Type</code></p>
+<p>This triple equal sign stands for judgemental equality. In type theory, we can have multiple types of equality, and note that this is different from the = sign stated as identity. So, Under context Gamma, A is judgementally equal to B which has type Type.</p>
+<hr>
+<h2 id="function-types">Function types</h2>
+<p>Most modern type theories introduce function types. They are introduced with an arrow symbol, and are defined inductively. For example, if <code>a</code> and <code>b</code> are types, then <code>a-&gt;b</code> is the type of a function which takes a parameter of type <code>a</code> and returns a term of type <code>b</code> . Types of this form are also known as simple types.</p>
+<p>Let’s walk through a simple example:</p>
+<pre><code>// add: a function that takes two natural numbers and return one nat number  
+add : nat -&gt; (nat -&gt; nat)
+</code></pre>
+<p>You may find weird the parentheses, since we’re all used with something like <code>add(a : nat, b : nat) -&gt; : nat</code> . What happens is that, strictly speaking, a simple type only allows for one input and one output, and this way, we could not receive two args in the way I wrote. Therefore, a better way to read this is: <code>add</code> is a function which takes a <code>nat</code> and returns another function of the form <code>nat -&gt; nat</code> . Note that the arrow is right associative.</p>
+<p>Ok, but untill now Type theories seem pretty inofensive right? What can we do about it? What this has to do with the image in the beginning of the article?</p>
+<p>Well, the power of type theories is in specifying how terms may be combined through inference rules. For example, for functions we have function application. If <code>a</code> is a term of type <code>c -&gt; d</code> and <code>b</code> is a term of type <code>c</code> , then the application of <code>a</code> to <code>b</code> , often written <code>( a b)</code> has type <code>d</code> . Example:</p>
+<pre><code>3 : nat  
+6 : nat  
+10 : nat  
+  
+(add 3) : nat -&gt; nat // partial application 3 + x  
+((add 6) 3) : nat // 9  
+((add 10) ((add 3) 6)) : nat // results in (10 + (3 + 6)) = 19
+</code></pre>
+<p>Note that function application is left associative.</p>
+<hr>
+<h2 id="computation">Computation</h2>
+<p>Type theory has a built-in notation of computation. The following terms are different:</p>
+<pre><code>1 + 5 : nat  
+3 + 3 : nat  
+0 + 6 : nat
+</code></pre>
+<p>But as you can see, they all compute to <code>6 : nat</code> . The concept of reduction / reduce to refer to computation. Example: <code>3 + 3 : nat</code> reduces to <code>6 : nat</code> and we can write this as: <code>3 + 3 : nat -&gt;&gt; 6 : nat</code> . A term without any variables that cannot be reduced further is called a canonical term.</p>
+<p>Terms that compute to the same term are equal. As I said before, equality is quite complex on type theory, and the equality we’re referring here is when two terms can be substituted for each other. For example:</p>
+<pre><code>x : nat  
+x + (10 + 2) : nat  
+x + (5 + 7) : nat  
+  
+x + (10 + 2) : nat -&gt;&gt; x + 12 : nat  
+x + (5 + 7) : nat -&gt;&gt; x + 12 : nat
+</code></pre>
+<p>The terms above are judgementally equal.</p>
+<p>OK, now that we discussed a little bit the basics, let’s try to develop a little bit more the function type (coming from lambda calculus). Let’s introduce it with a formal notation and then move forward to other types.</p>
+<hr>
+<h2 id="function-types-to-lambda-calculus--a-formal-formation">Function Types to Lambda Calculus : A formal formation</h2>
+<p>As discussed before, given two types A and B, there is a type <code>A -&gt; B</code>.</p>
+<p>We can write the formation rule for function types as follows:</p>
+<p><img src="./2.webp" alt="formation rule"></p>
+<p>Remember that Γ stands for context. A formation rule, as its name states, gives us a way to form function types.</p>
+<p>We can read this rule as: Under context Gamma, if A is of type Type and B is of type Type, then we have a function from type A to type B.</p>
+<p>But besides that, we cannot do anything more yet. Here it comes the introduction rule:</p>
+<p><img src="./3.webp" alt="introduction rule"></p>
+<p>We can read this as: Under context gamma, assume x is of type A. If b is of type B, then we have a function of type A that goes to type B receiving b as an argument.</p>
+<p>The introduction rule states that, to specify a term of <code>A -&gt; B</code>, it is sufficient to specify a term <code>b : B</code> for every <code>x : A</code> . To understand this rule, it is important to understand the lambda calculus representation of functions. So, for example: we can say that <code>λx.λy.( x y )</code> is a lambda term that receives two arguments, x and y, and applies x to y. When we receive an x and y, we substitute them in the term: <code>λx.λy ( x y ) negate 1 =&gt; ( negate 1 )</code>.</p>
+<p>That said, now we have terms of <code>A -&gt; B</code> but we have no rules to use them in a way. Now we need to introduce an <strong>elimination</strong> rule. The elimination rule for function type says that, given a function <code>f : A -&gt; B</code> and a term <code>a : A</code> we can form the term <code>f(a) : B</code> . Formally:</p>
+<p><img src="./4.webp" alt="elimination rule"></p>
+<p>But well, we have no way to compute that. We do not know how to compute that. So, we have a computation rule that tells us what happens when the elimination rule is applied to a result of the introduction rule (in this case, a new function type).</p>
+<p><img src="./5.webp" alt="function type"></p>
+<p>The notation <code>b[a / x] : B</code> is the term that we obtain from <code>b</code> by substituting <code>a</code> for every <code>x</code> . Therefore, we can read it as:</p>
+<p>Under context gamma, assume x is of type A. if b is of type B and a of type A, we have a function that receives b as an argument and it is judgementally equal to the term where we substitute all occurrences of x in b for a.</p>
+<p>To sum up, our rules state the following:</p>
+<ul>
+<li>For any type A and B, there is a type A -&gt; B called the function type. A term of A -&gt; B is called a function</li>
+<li>Defining a function <code>f : A -&gt; B</code> is equivalent to defining a term <code>f(x) : B</code> for every <code>x : A</code> .</li>
+</ul>
+<p>And, as I said before, type theory has many interpretations. About functions we can say that:</p>
+<ul>
+<li>For sets, it is the set of functions from set A to set B.</li>
+<li>For spaces, it is a space of function from A to B</li>
+<li>For propositions, this represents A implies B since having a proof o A -&gt; B is equivalent to having a proof of B for every proof of A.</li>
+</ul>
+<p>In the next article of this type theory series, we will discuss more this rules and introduce new types. If you find any mistake or typo, feel free to comment, as I’m still pretty new to this subject as well. Thanks for reading!</p>
+<hr>
+<h2 id="references">References</h2>
+<p><a href="https://en.wikipedia.org/wiki/Type_theory?source=post_page-----437df9e418c5--------------------------------">Type theory - Wikipedia</a></p>
+<p><a href="https://plato.stanford.edu/entries/type-theory/?source=post_page-----437df9e418c5--------------------------------">Type Theory</a></p>
+<p><a href="https://ncatlab.org/nlab/show/type+theory?source=post_page-----437df9e418c5--------------------------------">nLab type theory</a></p>
+<p><a href="https://en.wikipedia.org/wiki/History_of_type_theory?source=post_page-----437df9e418c5--------------------------------">History of type theory - Wikipedia</a></p>
+<p>And papers in the reference of those :)</p>
+
+
+  </div>
+
+  <!-- Prism Code Highlighting -->
+  <script src="https://unpkg.com/prismjs@1.28.0/components/prism-core.min.js"></script>
+	<script src="https://unpkg.com/prismjs@1.28.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>
