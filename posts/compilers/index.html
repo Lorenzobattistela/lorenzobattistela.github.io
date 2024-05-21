@@ -1,0 +1,168 @@
+<!-- This is an automatically generated file, do not edit it directly -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Compilers</title>
+  <meta charset="UTF-8">
+  
+  <!-- SEO -->
+  <meta name="author" content="Lorenzo Battistela">
+  <meta name="description" content="Compilers Unveiled, a Brief Introduction">
+  <meta property="og:title" content="Compilers">
+  <meta property="og:description" content="Compilers Unveiled, a Brief Introduction">
+  <meta property="og:site_name" content="Lorenzo">
+  <meta property="og:url" content="https://lorenzobattistela.github.io//posts/compilers">
+  <meta property="og:image" content="https://lorenzobattistela.github.io//card.jpg"/>
+  <meta property="og:type" content="Website"/>
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="627" />
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="Lorenzo">
+  <meta name="twitter:creator" content="Lorenzo Battistela">
+  <meta name="twitter:title" content="Compilers">
+  <meta name="twitter:description" content="Compilers Unveiled, a Brief Introduction">
+  <meta name="twitter:image:src" content="https://lorenzobattistela.github.io//card.jpg">
+  <!--  -->
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="Content-Language" content="en">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="generator" content="1POST" />
+  <link rel="icon" href="../../l_favicon.png">
+  <link href="https://unpkg.com/plume-css@1.0.13/lib/plume-all.css" rel="stylesheet" rel="preload" as="style" media="all" defer>
+  <link rel="stylesheet" href="https://unpkg.com/1post@1.0.3/themes/sweet-carnival.css">
+  <link href="https://unpkg.com/prismjs@1.28.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+  <style>
+    :root {
+      --pm-paragraph-font-size: 1.2em
+    }
+
+    .plume .pm-link, .plume a {
+      font-size: var(--pm-paragraph-font-size);
+    }
+  </style>  
+</head>
+<body class="plume">
+  <div class="pm-container">
+    <h1>Compilers</h1>
+
+    <p>
+      <a href="../..">← ← ←</a> &nbsp; 
+      5/21/2024, 4:14:01 PM | <strong>Posted by:</strong>
+      <a href="https://github.com/Lorenzobattistela" target="_blank" rel="noreferrer noopener">Lorenzo Battistela</a>
+    </p>
+
+    <hr>
+
+    
+
+<p>“A compiler is a computer program that translates computer code written in one programming language into another language”.</p>
+<p>The compiler is one component in a toolchain of programs that are used to create executable files from source code. In general, when a single compile command is called, a whole sequence of programs are invoked in the background. Let’s understand this process and how does a compiler work.</p>
+<hr>
+<h2 id="compilation-steps">Compilation Steps</h2>
+<p>As stated before, the compiler itself is not the only “actor” when we are translating source code to executable code. Typically, we can divide this process in four steps:</p>
+<ul>
+<li>Preprocessing: it prepares the source code for the compiler proper. For example, in C and C++, this is translated to consuming all directives that start with the # symbol. An #include directive causes the preprocessor to open the named file an insert its content into the source code. On the other hand, a #define causes the preprocessor to substitute a value wherever a macro name is encountered. Note that this is very flexible on the language, and not all of them rely on a preprocessor.</li>
+<li>Compiling: it properly consumes the clean output of the preprocessor. We’ll discuss compiler steps itself soon, but basically it scans an parse the source code, performs typechecking and other semantic routines, optimizations and then produces assembly language as output.</li>
+<li>Assembling: the assembler consumes the output of the compiler, an produces object code. Object code can be described as “almost executable”, since it contains raw machine learning instructions in the form needed by the CPU. However, it does not know the final memory addresses in which it will be loaded, so it still contains some gaps.</li>
+<li>Linking: the final step is done by the linker, which consumes one or more object files and library files and combines them into one complete executable program. It selects the final memory locations where each piece of code an data will be loaded and “links” them together by writing in the missing address information. For example, if our object file calls the malloc function, it does not know initially the address of the function. Then, a zero (empty) address will be left where the address must be used. Once the linker defines the memory location of malloc, it must go back and write in the address at every place where malloc is called.</li>
+</ul>
+<p>This the overview of how the compilation process works. For this article, we will see the compiling step deeper, since it can be split up into several stages.</p>
+<p>Let’s think this up a little bit. If the compiler outputs assembly code and receives a preprocessed source code file in some programming language, how would you translate this? Well, the first obvious step is to read up the source file and form tokens. This is know as scanning.</p>
+<hr>
+<h2 id="scanning">Scanning</h2>
+<p>It is the process of identifying tokens from the raw text source code of a program. It has to fit in tokens in many categories, like keywords, identifiers, numbers, comments, etc.</p>
+<p>For example, this could be a simple C function to scan tokens:</p>
+<pre><code class="language-c">token_t scan_token( FILE *fp ) {  
+ int c = fgetc(fp);  
+ if(c==’*’) {  
+  return TOKEN_MULTIPLY;  
+ } else if(c==’!’) {  
+  char d = fgetc(fp);  
+   if(d==’=’) {  
+    return TOKEN_NOT_EQUAL;  
+   } else {  
+  ungetc(d,fp);  
+  return TOKEN_NOT;  
+  }  
+ } else if(isalpha(c)) {  
+ do {  
+   char d = fgetc(fp);  
+  } while(isalnum(d));  
+  ungetc(d,fp);  
+  return TOKEN_IDENTIFIER;  
+ } else if ( . . . ) {  
+ . . .  
+ }  
+}
+</code></pre>
+<p>Note that the snippet is not complete since we haven’t defined those TOKEN_ identifiers, but the logic remains. We need to loop and keep identifying tokens, knowing that it can be part of a sequence. For example, if I identify a token “!”, it could be the not logical operator or a part of the “!=” sign, so the character which is not part of the sequence is put back. This process where an unexpected item doesn’t match the current objective and it must be put back for later is known as backtracking. When scanning a large number of tokens, it is common to use such things as <a href="https://en.wikipedia.org/wiki/Regular_expression">Regex</a> and <a href="https://en.wikipedia.org/wiki/Finite-state_machine">Finite Automata</a>. I will not get into detail about these topics here. In general, if you want to build a scanner, you can use something like <a href="https://www.cs.princeton.edu/~appel/modern/c/software/flex/flex.html">C Flex</a>.</p>
+<p>A simple scanner example can be found here: <a href="https://github.com/Lorenzobattistela/compilers/tree/main/scanner">https://github.com/Lorenzobattistela/compilers/tree/main/scanner</a></p>
+<hr>
+<h2 id="parser">Parser</h2>
+<p>Parsers are widely known in all tech fields. Let’s continue with our logic. We read the source file in plain text and grouped individual characters to form complete tokens. But this does not mean nothing at all yet. If I know I have “!=”, what could I do with it alone? Nothing. So the parser consume the tokens an groups them together into copmlete statements and expressions, much like words are grouped into sentences in a natural language. The parser is guided by a grammar which states the formal rules of composition in a given language. The output of a parser is an Abstract Syntax Tree that captures the grammatical structures of the program.</p>
+<p>But of course, not every sequence of words make a valid sentence. Parsing a computer program involves describing the form of valid sentences in a language. This formal statement is known as Context Free Grammar (CFG). They allow recursion and can express richer set of structures. But a CFG is not easy to parse, because it can contain ambiguities an other problems that make hard to write an automatic parser. Therefore, in general we consider two subsets of CFGs known as LL(1) and LR(1) grammars.</p>
+<p>LL(1) grammars are CFGs that can be evaluate by considering only the current rule and next token in the input stream. Not all language structures can be expressed as LL(1) grammars.</p>
+<p>LR(1) grammars are more general and powerful than LL(1), but more complex to parse.</p>
+<p>For this article, I’ll only briefly describe the parts of a CFG, because the whole process of sentence deriving, resolving ambiguities and converting grammars can be quite complex (but maybe I’ll approach it in another article). In addition, typically a parser generator is used and the only reason for you to build a parser by hand is to study. (IMO).</p>
+<p><strong>Parts of a CFG</strong></p>
+<ul>
+<li>Terminal: it is a discrete symbol that can appear in the language, otherwise known as a token (from scanners). Examples of terminals are keyword, operators and identifiers. We use lower-case letters to represent terminal.</li>
+<li>Non-terminal: represents a structure that can occur in a language, but is not a literal symbol. Examples are declarations, statements and expressions. We use upper-case letters to represent them. (e.g P for program, S for statement, etc.)</li>
+<li>Sentence: it is a valid sequence of terminals in a language, while a sentential form is a valid sequence of terminals and non-terminal. Greek symbols represent sentential forms.</li>
+</ul>
+<p>A CFG is a list of rules that formally describe allowable sentences in a language. The left-hand side of each rule is always a single non-terminal. The right-hand side of a rule is a sentential form that describes an allowable form of that terminal. For example, B -&gt; xXy indicates that non-terminal A represents a terminal x followed by a non-terminal X and terminal y.</p>
+<p>The parsing processing returns an AST, which is a representation of abstract synctatic structure of text written in a formal language. Each node of the tree denotes a construct occurring in the text. Ex:</p>
+<p><img src="1.webp" alt=""></p>
+<p>By Dcoetzee — Own work, CC0, <a href="https://commons.wikimedia.org/w/index.php?curid=14676451">https://commons.wikimedia.org/w/index.php?curid=14676451</a></p>
+<p>In the parsing process, we have semantic routines that traverse the AST and derive additional meaning (semantics) about the program from the rules of the language an the relationship between elements of the program. For example, suppose this AST:</p>
+<pre><code>x = 5  
+y = 10  
+z = x + y \* 2
+</code></pre>
+<pre><code> =  
+  / \
+ x   +  
+    / \
+   y   *  
+      / \ 
+     10  2
+</code></pre>
+<p>And that we have the rule:</p>
+<p>1: Variables must be declared before use.</p>
+<p>The semantic routine would ensure that ‘x’, ‘y’ and ‘z’ have been declared before use.</p>
+<hr>
+<h2 id="type-checking">Type checking</h2>
+<p>After the parser has successfully grouped tokens into complete statements and expressions and created an Abstract Syntax Tree (AST), the next crucial step in the compilation process is type checking. Type checking ensures that the program adheres to the language’s type system rules, verifying that operations are performed on compatible data types and that variables are used in a manner consistent with their declared types.</p>
+<p>The type checking process traverses the AST, examining expressions and statements to confirm their semantic correctness. Type theory can get quite complex, so I recommend reading some stuff about it. <a href="https://en.wikipedia.org/wiki/Type_theory">https://en.wikipedia.org/wiki/Type_theory</a></p>
+<p>Failure to pass the type checking phase results in compilation errors or warnings, indicating the specific issues that need to be addressed by the programmer. This phase plays a crucial role in ensuring the reliability and correctness of the generated code.</p>
+<p>Once type checking is successfully completed, the compiler proceeds to generate an intermediate representation (IR) of the program, which captures the essential semantics and type information. This IR forms the basis for subsequent optimization and code generation stages.</p>
+<hr>
+<h2 id="intermediate-representation-generation">Intermediate Representation Generation</h2>
+<p>The generation of the Intermediate Representation (IR) occurs immediately after parsing. During this stage, the compiler takes the AST and transforms it into a more abstract, language-independent representation that captures the essential semantics of the program. The IR represents the program’s logic and data flow in a way that is easier to optimize and translate into machine code. This transformation simplifies further analysis and optimizations.</p>
+<p>The IR generation stage may involve converting the AST into a series of intermediate code instructions or data structures that can be easily manipulated and analyzed by subsequent compiler stages. The specific form of the IR can vary depending on the design of the compiler.</p>
+<hr>
+<h2 id="optimization">Optimization</h2>
+<p>Once we have the IR generated, one or more optimization stages can be applied to improve the program’s performance efficiency. These optimizations operate on the intermediate representation rather than the original source code because the IR is a more structured and abstract representation of the program, making it easier to analyze and optimize. This is another subject that I won’t get much into detail, since I plan to write some articles just on it. But if you want to look up, some common optimizations include dead code elimination, constant folding and loop unrolling.</p>
+<hr>
+<h2 id="code-generator">Code generator</h2>
+<p>Finally, a code generator consumes the optimized IR we got and transforms it into a concrete assembly language program. Typically, a code generator must perform register allocation to effectively manage the limited number of hardware registers, and instruction selection and sequencing to order assembly instructions in the most efficient form.</p>
+<hr>
+<h2 id="conclusion">Conclusion</h2>
+<p>Well, understanding how a compiler works is really interesting and the basis is quite cool. Building a compiler is also a nice side-project (and something i’m working on too). I plan to write more articles in this subject and go deeper into some subjects like type checking and finite automata.</p>
+<hr>
+<h2 id="references">References</h2>
+<p><a href="https://en.wikipedia.org/wiki/Compiler?source=post_page-----fa87ab5f3f3a--------------------------------">Compiler - Wikipedia</a></p>
+<p><a href="https://www.cs.princeton.edu/~appel/modern/c/software/flex/flex.html?source=post_page-----fa87ab5f3f3a--------------------------------">Flex - a scanner generator</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Type_theory?source=post_page-----fa87ab5f3f3a--------------------------------">Type theory - Wikipedia</a></p>
+<p><a href="https://www3.nd.edu/~dthain/compilerbook/?source=post_page-----fa87ab5f3f3a--------------------------------">Introduction to Compilers and Language Design</a></p>
+
+
+  </div>
+
+  <!-- Prism Code Highlighting -->
+  <script src="https://unpkg.com/prismjs@1.28.0/components/prism-core.min.js"></script>
+	<script src="https://unpkg.com/prismjs@1.28.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>
