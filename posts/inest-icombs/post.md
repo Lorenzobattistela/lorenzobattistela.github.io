@@ -21,11 +21,15 @@ Interaction nets are a universal interaction system. This statement implies that
 
 I will introduce the symbols and syntax as per the original article. Interaction nets are built uppon a piece called cell. For example, here we have a symbol alpha with it's arity ≥ 0 (where arity is the number of auxiliar ports). Such a symbol is called a cell:
 
+![Cell](./1.png)
+
 A cell always have one principal port and n N auxiliar ports.  Since arity can be equal to zero, we can also have a cell with no auxiliary port:
 
+![Cell with no auxiliary](./2.png)
 
 We can define a net in terms of a graph, consisting of a finite number of cells and an extra set of free ports, where each port is connected to another one by means of a wire. For example, we can build the following net:
 
+![Example net](./3.png)
 
 Note that here, alpha has arity 2 (because it has 2 auxiliary ports), beta has arity 1 (just one auxiliary port) and gamma is arity 0 since it has no auxiliary port. The net above has three free ports: x, y and z. 
 
@@ -45,6 +49,8 @@ A wiring is a net w without cell and without cyclic wire. It is just a pairing o
 
 Interaction is defined formally as a reduction of form:
 
+![Interaction rule](./4.png)
+
 Where we have a finite alphabet with m symbols (from a1 to am) with arities n1 to nm. Then, an interaction rule is a reduction where v i,j is a net with ni + nj free ports. 
 
 Basically, the interaction rule will reduce the first net to the second one, considering that cells can only intereact pairwise, through their principal ports. The free ports last in the reduced net is the sum of the arities of the cells a_i and a_j. It will make more sense when we visualize this rule in practice. 
@@ -59,11 +65,11 @@ The consequence of this rule is that if we have a net A that reduces to an irred
 
 ### Simulating Unary Arithmetics
 
-We can simulate unary arithmetics using a similar encoding as in lambda calculus (at least when i learned about it). We need the symbols `s`, which stands for successor and it is of arity 1. We also need a way to represent 0, our symbol of arity 0. 
+We can simulate unary arithmetics using a similar encoding as in lambda calculus (at least when i learned about it). We need the symbols `s`, which stands for successor and it is of arity 1. We also need a way to represent 0, our symbol of arity 0.
 
 Then, we define sum and product operations through the following equations:
 
-- `sx + y = s(x + y)` 
+- `sx + y = s(x + y)`
 - `0 + y = y`
 - `sx * y = (x * y) + y`
 - `0 * y = 0`
@@ -72,22 +78,27 @@ Note that this is defined inductively.
 
 In this example (also described in the original paper), we have an unusual cell way of representing the system:
 
-Note that since addition is defined by induction in the first argument, we need to plug this argument into the principal port of +. 
+![Unary arithmetics](./5.png)
+
+Note that since addition is defined by induction in the first argument, we need to plug this argument into the principal port of +.
+
+![Addition rules](./addition.png)
 
 With the rules for addition, we can see that sum with 0 is a simple wire (which ultimately results in our y as in the rule `0 + y = y`). When you add with a successor, we can visually see our rule happening. The upper `s` port would be sx, the successor of `x`. The principal port of the `+` port connects with `s`, resulting in the auxiliary ports for the `+` cell y and x + y. After the interaction, the auxiliar port where the sum is now has the successor cell in it, indicating s(x + y) as we stated before.
 
 Sum is easy, but we also have to define the product rule. Look at our rules. The argument `y` is used twice in the first equation defining multiplication, and not used in the second one. For this, we need another two symbols. One for duplication (since we use it twice in the first equation) and eraser (when we dont have to use it at all).
 
-Its names already tell what they do. When a net representing a nat number is connected to a duplicator port, it should be duplicated, and when connected to the erasor, it should be erased. Then, we have the following rules for multiplication: 
+Its names already tell what they do. When a net representing a nat number is connected to a duplicator port, it should be duplicated, and when connected to the erasor, it should be erased. Then, we have the following rules for multiplication:
+
+![Multiplication rules](./6.png)
+
+![Dup and erasing](./dup_erase.png)
 
 Note that, in our previous definition, the principal port holds x, the first aux port (from left to right) holds y and the last one holds x * y.
 
-Look that when defining `sx * y`, it results in a sum port `x + y` with its principal port connected with the result of a product port.  This happens because now we will sum `y` with the result of `x * y`, how without the old `suc` that we removed. It is a recursive operation that in the end will sum it all together to find the result. This works because we know that, for example, 3 * 2 is the same thing as (2 * 2) + 2, and we can rewrite it this way recursively until we get only sums (because eventualy we will reach a 0 multiplication). 
+Look that when defining `sx * y`, it results in a sum port `x + y` with its principal port connected with the result of a product port.  This happens because now we will sum `y` with the result of `x * y`, how without the old `suc` that we removed. It is a recursive operation that in the end will sum it all together to find the result. This works because we know that, for example, 3 * 2 is the same thing as (2 * 2) + 2, and we can rewrite it this way recursively until we get only sums (because eventualy we will reach a 0 multiplication).
 
 The duplicator symbol is used because we need to use `y` twice, once in the sum cell and other in the recursive product.
-
-Let's compute a product operation, so we can see in practice how sum and product work:
-
 
 ### Reduced Nets
 
@@ -97,7 +108,7 @@ To define vicious circles, we shall define principal paths. A wire is said to be
 
 Now, think about three `suc` cell. Let's connect the principal port of `suc_0` to the aux port of `suc_2`. Then, the main port of `suc_1` to the aux port of `suc_0` and finally the main port of `suc_2` to the aux port of `suc_1`. The result would look like this:
 
-// image here
+![Vicious circle](./7.png)
 
 Note that we cannot reduce this, and that this is a closed path. If we keep following connections, we will do that infinitely. This is called a closed principal path of length N, and it is a *vicious circle* of length N.
 
@@ -113,7 +124,9 @@ Another thing to note is that for unary arithmetics, *all right members of rules
 ## Interaction Combinators
 Now that we know and understand what are interaction nets, let's understand the universality of the system of interaction combinators. The rules for the combinators are only six:
 
-Rules for the combinatorsThe system of interaction combinators consists of three symbols (the combinators). 
+![Rules for the combinator](./8.png)
+
+The system of interaction combinators consists of three symbols (the combinators). 
 - Gamma: constructor - arity 2
 - Delta: duplicator - arity 2
 - Epsilon: eraser - arity 0
@@ -130,15 +143,13 @@ Let's follow up introducing a construction inspired by the rules of linear logic
 
 A multiplexor allows you to bundle and unbundle many wires into a single wire. The rules are given by the image below:
 
-// image here
+![Multiplexor](./9.png)
 
-Note that we have M_n and M*_n. The multiplexor magic happens when these two come together. We could connect them directly when building a net or have a net where initially they are not connected, but then they get connected through some reduction. When `M_n` and `M*_n` interact, we unbundle `n` wires that were packed into one! Here is an example of a multiplexor reduction:
-
-// example
+Note that we have M_n and M*_n. The multiplexor magic happens when these two come together. We could connect them directly when building a net or have a net where initially they are not connected, but then they get connected through some reduction. When `M_n` and `M*_n` interact, we unbundle `n` wires that were packed into one!
 
 We can also construct other structures that come from linear logic, such as Menus and Selectors. For example, we can think about a menu as multiplexors that connect `N` packages to `N - 1` erasers, leaving only the selected choice bundled after the reduction.
 
---- 
+---
 
 Conclusion
 
@@ -148,6 +159,8 @@ This is a gentle and easy introduction to Interaction Nets model of computation,
 - Semantics of Interaction Combinators
 - Symmetric Interaction Calculus (SIC)
 - HVM - how is this being used
+
+Note that this article is heavily based on the original article by Yves Lafont, and its purpose is to be a learning resource with a more straightforward approach and less mathematical notation.
 
 I'll leave my references and other resources to learn more about this below:
 
