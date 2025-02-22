@@ -1,0 +1,188 @@
+<!-- This is an automatically generated file, do not edit it directly -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Elementary Affine Logic</title>
+  <meta charset="UTF-8">
+  
+  <!-- SEO -->
+  <meta name="author" content="Lorenzo Battistela">
+  <meta name="description" content="Understanding EAL and typechecking it">
+  <meta property="og:title" content="Elementary Affine Logic">
+  <meta property="og:description" content="Understanding EAL and typechecking it">
+  <meta property="og:site_name" content="Lorenzo">
+  <meta property="og:url" content="https://lorenzobattistela.github.io//posts/eal">
+  <meta property="og:image" content="https://lorenzobattistela.github.io//card.jpg"/>
+  <meta property="og:type" content="Website"/>
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="627" />
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="Lorenzo">
+  <meta name="twitter:creator" content="Lorenzo Battistela">
+  <meta name="twitter:title" content="Elementary Affine Logic">
+  <meta name="twitter:description" content="Understanding EAL and typechecking it">
+  <meta name="twitter:image:src" content="https://lorenzobattistela.github.io//card.jpg">
+  <!--  -->
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="Content-Language" content="en">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="generator" content="1POST" />
+  <link rel="icon" href="../../l_favicon.png">
+  <link href="https://unpkg.com/plume-css@1.0.13/lib/plume-all.css" rel="stylesheet" rel="preload" as="style" media="all" defer>
+  <link rel="stylesheet" href="https://unpkg.com/1post@1.0.3/themes/solar-theme.css">
+  <link href="https://unpkg.com/prismjs@1.28.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+  <style>
+    :root {
+      --pm-paragraph-font-size: 1.2em
+    }
+
+    .plume .pm-link, .plume a {
+      font-size: var(--pm-paragraph-font-size);
+    }
+  </style>  
+</head>
+<body class="plume">
+  <div class="pm-container">
+    <h1>Elementary Affine Logic</h1>
+
+    <p>
+      <a href="../..">← ← ←</a> &nbsp; 
+      2/22/2025, 7:54:15 PM | <strong>Posted by:</strong>
+      <a href="https://github.com/Lorenzobattistela" target="_blank" rel="noreferrer noopener">Lorenzo Battistela</a>
+    </p>
+
+    <hr>
+
+    
+
+<p>Elementary Affine Logic (EAL) is a type system designed to guarantee that programs terminate in elementary time—a complexity class bounded by finite towers of exponentials, such as 
+<code>2^(2^n)</code>
+. This makes EAL a powerful framework for reasoning about computational efficiency in a rigorous way. For this article, we&#39;ll focus on propositional EAL without quantification, keeping our exploration accessible while diving into its core concepts and implementation. It is important to note that the implementation is not focusing on performance and not performing type inference, only basic type checking.</p>
+<p>EAL is built upon affine logic, a substructural logic that modifies traditional proof theory by rejecting the contraction rule, which prevents assumptions from being reused multiple times, while embracing weakening, allowing unused variables to remain in the context. This contrasts with linear logic, where variables must be used exactly once; affine logic relaxes this to &quot;at most once,&quot; providing flexibility to ignore resources if they are not needed. In the context of programming, particularly within lambda calculus, this translates to a system where function arguments are used at most once, with some potentially left unused. EAL extends this foundation to target terms that align with the computational power of elementary bounded Turing machines. It also connects to Lamping&#39;s optimal reduction algorithm, which minimizes the number of beta-reduction steps, ensuring efficient normalization of terms.</p>
+<h3 id="core-characteristics-of-eal">Core Characteristics of EAL</h3>
+<p>EAL is specifically crafted to type terms that can be reduced in elementary time, leveraging affine logic&#39;s resource-sensitive nature. Variables cannot be reused unless explicitly marked with the bang modality (!A), which allows controlled reuse, while unused assumptions are permitted, aligning with the weakening rule. The bang modality (!A) is central to EAL, selectively relaxing the &quot;at most once&quot; rule to balance efficiency and flexibility. However, this imposes restrictions, preventing constructs like extensive variable sharing or polymorphism from being typed within the system—a necessary trade-off for EAL&#39;s performance guarantees.</p>
+<h3 id="implementing-eal">Implementing EAL</h3>
+<p>Now let&#39;s gets get to work and write a simple implementation of EAL in Haskell.
+This implementation focuses on the concept and the simple typing rules, not in
+performance neither the type inference (that is more complex).</p>
+<p>The first step is to define the types and terms that constitute the EAL system:</p>
+<pre><code class="language-haskell">-- Type definitions
+data Type
+  = TVar String          -- Type variable, e.g., &quot;a&quot;
+  | Bang Type            -- !A, for reusable terms
+  | Type :-&gt; Type        -- Function type, A -&gt; B
+  deriving (Show, Eq)
+
+-- Term definitions
+data Term
+  = Var String           -- Variable, e.g., &quot;x&quot;
+  | App Term Term        -- Application, M N
+  | Lam String Type Term -- Lambda abstraction, \x:A.M
+  | Box Term             -- Boxing for !A
+  deriving (Show, Eq)
+</code></pre>
+<p>These definitions capture the essence of EAL. For types, <code>TVar String</code> represents type variables. Bang Type introduces the <code>!A</code> modality, marking a type as reusable, which is crucial for EAL&#39;s promotion rule. <code>Type :-&gt; Type</code> defines function types (e.g., <code>A -&gt; B</code>), mirroring the arrow type in lambda calculus. For terms, <code>Var String</code> represents variables (e.g., &quot;x&quot;) associated with types in the context. <code>App Term</code> Term corresponds to applying one term to another (e.g., <code>M N</code>). <code>Lam String Type Term</code> represents lambda abstraction (e.g., <code>λx:A.M</code>), binding a variable to its type for function definitions. Finally, <code>Box Term</code> wraps a term to assign it the type <code>!A</code>, enabling controlled reuse through the bang modality.</p>
+<p>Now, we need to define the context and how do we interact with it.
+We need to track down variable usages. Note that this could be done only via typing, i.e we could enforce the affine property in the type of the context instead of naively implementing it in the functions. The way is done here, if a context is already broken on creation, an error will not pop. But since this is a toy implementation, im ok with that.</p>
+<pre><code class="language-haskell">type Ann = (String, Type)  -- Annotated variable, e.g., (&quot;x&quot;, TVar &quot;a&quot;)
+type Ctx = [Ann]           -- Context as a list of annotations
+type UsedVars = [String]   -- List of variables used so far
+
+-- Extend context with a new variable
+extend :: Ctx -&gt; Ann -&gt; Either String Ctx
+extend ctx ann@(var, typ) =
+  case lookup var ctx of
+    Just _  -&gt; Left (&quot;Variable &quot; ++ var ++ &quot; used more than once.&quot;)
+    Nothing -&gt; Right (ann : ctx)
+
+-- Filter out used variables, keeping banged ones
+filterUsed :: Ctx -&gt; [String] -&gt; Ctx
+filterUsed ctx used = filter (\(s, t) -&gt; s `notElem` used || case t of Bang _ -&gt; True; _ -&gt; False) ctx
+
+-- Check if all variables are banged
+allBanged :: Ctx -&gt; Bool
+allBanged ctx = all (\(_, t) -&gt; case t of Bang _ -&gt; True; _ -&gt; False) ctx
+</code></pre>
+<p>Here, <code>Ann</code> and <code>Ctx</code> define the structure of the typing context, pairing variables with their types. <code>UsedVars</code> tracks consumed variables, ensuring non-banged variables are not reused. The extend function adds a new variable to the context but fails if the variable is already present, reflecting EAL&#39;s no-contraction rule. <code>filterUsed</code> updates the context after a variable is used: non-banged variables are removed once consumed, while banged variables (!A) remain available, aligning with the dereliction and contraction rules. <code>allBanged</code> checks if every variable in the context has a banged type, a prerequisite for the promotion rule used in the Box construct. These mechanisms ensure the context accurately reflects variable availability, respecting affine constraints and the exceptions granted by the bang modality.</p>
+<p>Now let&#39;s do some type checking!</p>
+<p>The core of the implementation lies in the typeCheck function, which enforces EAL&#39;s typing rules across four patterns: variables, application, lambda abstraction, and boxing:</p>
+<pre><code class="language-haskell">typeCheck :: Ctx -&gt; Term -&gt; Either String (Type, UsedVars)
+-- Variable case
+typeCheck ctx (Var x) =
+  case lookup x ctx of
+    Just (Bang t) -&gt; Right (t, [])       -- Banged variable, reusable
+    Just t        -&gt; Right (t, [x])      -- Non-banged, used once
+    Nothing       -&gt; Left $ &quot;Variable &quot; ++ x ++ &quot; not found in context&quot;
+
+-- Application case
+typeCheck ctx (App m n) = do
+  (typM, varsM) &lt;- typeCheck ctx m
+  case typM of
+    a :-&gt; b -&gt; do
+      let newCtx = filterUsed ctx varsM
+      (typN, varsN) &lt;- typeCheck newCtx n
+      if typN == a
+        then Right (b, varsM ++ varsN)
+        else Left (&quot;Type Mismatch. Expected: &quot; ++ show typN ++ &quot; to be of type &quot; ++ show a)
+    _ -&gt; Left &quot;Application requires a function type&quot;
+
+-- Lambda case
+typeCheck ctx (Lam bound typ bod) = do
+  newCtx &lt;- extend ctx (bound, typ)
+  (typBod, varsBod) &lt;- typeCheck newCtx bod
+  let lamTyp = typ :-&gt; typBod
+  let freeVars = filter (/= bound) varsBod
+  Right (lamTyp, freeVars)
+
+-- Box case
+typeCheck ctx (Box t) = do
+  if allBanged ctx
+    then do
+      (typT, varsT) &lt;- typeCheck ctx t
+      Right (Bang typT, varsT)
+    else Left &quot;Promotion requires a context of only banged types&quot;
+</code></pre>
+<p>Each case corresponds to a specific typing rule in EAL, which we&#39;ll now examine using standard type theory notation.</p>
+<p>Variable (Var x)</p>
+<pre><code> x : A ∈ Γ 
+------------ (if A is not banged)
+ Γ ⊢ x : A
+
+
+ x : !A ∈ Γ
+------------ (dereliction for banged variables)
+ Γ ⊢ x : A
+</code></pre>
+<p>For a variable x, the type checker looks it up in the context. If x has a banged type (!A), it can be used as A without being consumed, thanks to the dereliction rule, so it&#39;s not added to the list of used variables. If x has a non-banged type (A), it&#39;s used once and marked as consumed. This enforces EAL&#39;s no-contraction rule while allowing banged variables to persist.</p>
+<p>Application (App m n)</p>
+<pre><code> Γ ⊢ M : A → B   Δ ⊢ N : A
+--------------------------
+  Γ,Δ ⊢ M N : B
+</code></pre>
+<p>To type M N, the type checker first types M in the current context to obtain its type, which must be a function A -&gt; B. It then filters the context to remove any non-banged variables used in M, ensuring they aren&#39;t reused illicitly. Next, it types N in this updated context to check if its type matches A. If so, the application is typed as B, and the used variables from both M and N are combined.</p>
+<p>Lambda (Lam bound typ bod)</p>
+<pre><code>   Γ, x : A ⊢ M : B
+-----------------------
+  Γ ⊢ λx : A.M : A → B
+</code></pre>
+<p>Typing Rule:</p>
+<p>For a lambda abstraction \x:A.M, the type checker extends the context with x : A, ensuring x is fresh per the no-contraction rule. It then types the body M in this extended context to determine its type B. The overall type of the lambda is A -&gt; B, and any variables used in the body (except x) are tracked for future checks.</p>
+<p>Box (Box t) - Promotion</p>
+<pre><code>  Γ ⊢ M : A where Γ = x1 : !A1, ..., xn : !An
+-----------------------------------------------
+                  Γ ⊢ !M : !A
+</code></pre>
+<p>The Box construct implements the promotion rule, allowing a term M to be &quot;boxed&quot; into !A if it can be typed in a context where all variables are banged, checked using allBanged. If the condition holds, the type checker types M in the current context and wraps its type in Bang, enabling reuse. If the context contains non-banged variables, the promotion fails, enforcing EAL&#39;s strict conditions for reuse.</p>
+<p>EAL&#39;s power lies in guaranteeing that any term it types will normalize in elementary time, often achieved through reduction strategies like Lamping&#39;s algorithm, which optimizes the reduction process by minimizing redundant steps. The combination of strict variable usage and controlled reuse via the bang modality ensures that reduction complexity is bounded predictably. However, this comes at the cost of some expressiveness.</p>
+<p>See you in the next article!</p>
+
+
+  </div>
+
+  <!-- Prism Code Highlighting -->
+  <script src="https://unpkg.com/prismjs@1.28.0/components/prism-core.min.js"></script>
+	<script src="https://unpkg.com/prismjs@1.28.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>
