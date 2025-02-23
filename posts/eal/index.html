@@ -176,7 +176,11 @@ typeCheck ctx (Box t) = do
 </code></pre>
 <p>The Box construct implements the promotion rule, allowing a term M to be &quot;boxed&quot; into !A if it can be typed in a context where all variables are banged, checked using allBanged. If the condition holds, the type checker types M in the current context and wraps its type in Bang, enabling reuse. If the context contains non-banged variables, the promotion fails, enforcing EAL&#39;s strict conditions for reuse.</p>
 <p>EAL&#39;s power lies in guaranteeing that any term it types will normalize in elementary time, often achieved through reduction strategies like Lamping&#39;s algorithm, which optimizes the reduction process by minimizing redundant steps. The combination of strict variable usage and controlled reuse via the bang modality ensures that reduction complexity is bounded predictably. However, this comes at the cost of some expressiveness.</p>
-<p>See you in the next article!</p>
+<h2 id="references-and-further-reading">References and Further Reading</h2>
+<p><a href="https://doi.org/10.1007/11417170_6">Baillot, P., Terui, K. (2005). A Feasible Algorithm for Typing in Elementary Affine Logic. In: Urzyczyn, P. (eds) Typed Lambda Calculi and Applications. TLCA 2005. Lecture Notes in Computer Science, vol 3461. Springer, Berlin, Heidelberg.</a></p>
+<p><a href="https://doi.org/10.1007/11417170_11">Coppola, P., Dal Lago, U., Della Rocca, S.R. (2005). Elementary Affine Logic and the Call-by-Value Lambda Calculus. In: Urzyczyn, P. (eds) Typed Lambda Calculi and Applications. TLCA 2005. Lecture Notes in Computer Science, vol 3461. Springer, Berlin, Heidelberg.</a></p>
+<p><a href="https://www.academia.edu/73045075/Principal_Typing_for_Lambda_Calculus_in_Elementary_Affine_Logic">Coppola, Paolo. “Principal Typing for Lambda Calculus in Elementary Affine Logic.” Fundamenta Informaticae (2005): n. pag. Print.</a></p>
+<p><a href="https://arxiv.org/abs/1805.07518">Affine logic for constructive mathematics</a></p>
 
 
   </div>

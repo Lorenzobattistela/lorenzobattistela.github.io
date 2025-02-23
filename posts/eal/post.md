@@ -164,5 +164,17 @@ The Box construct implements the promotion rule, allowing a term M to be "boxed"
 
 EAL's power lies in guaranteeing that any term it types will normalize in elementary time, often achieved through reduction strategies like Lamping's algorithm, which optimizes the reduction process by minimizing redundant steps. The combination of strict variable usage and controlled reuse via the bang modality ensures that reduction complexity is bounded predictably. However, this comes at the cost of some expressiveness.
 
-See you in the next article!
+## References and Further Reading
+
+[Baillot, P., Terui, K. (2005). A Feasible Algorithm for Typing in Elementary Affine Logic. In: Urzyczyn, P. (eds) Typed Lambda Calculi and Applications. TLCA 2005. Lecture Notes in Computer Science, vol 3461. Springer, Berlin, Heidelberg.](https://doi.org/10.1007/11417170_6)
+
+
+[Coppola, P., Dal Lago, U., Della Rocca, S.R. (2005). Elementary Affine Logic and the Call-by-Value Lambda Calculus. In: Urzyczyn, P. (eds) Typed Lambda Calculi and Applications. TLCA 2005. Lecture Notes in Computer Science, vol 3461. Springer, Berlin, Heidelberg.](https://doi.org/10.1007/11417170_11)
+
+
+[Coppola, Paolo. “Principal Typing for Lambda Calculus in Elementary Affine Logic.” Fundamenta Informaticae (2005): n. pag. Print.](https://www.academia.edu/73045075/Principal_Typing_for_Lambda_Calculus_in_Elementary_Affine_Logic)
+
+
+[Affine logic for constructive mathematics](https://arxiv.org/abs/1805.07518)
+
 
