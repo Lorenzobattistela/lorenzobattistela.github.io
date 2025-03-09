@@ -1,0 +1,42 @@
+{
+  "name": "lorenzo-blog",
+  "version": "1.0.0",
+  "description": "Lorenzo Battistela's Blog",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "export": "next build",
+    "editor": "next dev",
+    "migrate": "node scripts/migrate-posts.js"
+  },
+  "keywords": [
+    "blog",
+    "programming",
+    "mathematics",
+    "computer science"
+  ],
+  "author": "Lorenzo Battistela",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@vercel/analytics": "^1.5.0",
+    "easymde": "^2.20.0",
+    "gray-matter": "^4.0.3",
+    "highlight.js": "^11.11.1",
+    "katex": "^0.16.21",
+    "marked": "^15.0.7",
+    "marked-katex-extension": "^5.1.4",
+    "next": "^15.2.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
+    "react-simplemde-editor": "^5.2.0",
+    "rehype-katex": "^7.0.1",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
+    "sass": "^1.85.1"
+  }
+}
