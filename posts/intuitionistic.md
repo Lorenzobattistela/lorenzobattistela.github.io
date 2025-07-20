@@ -184,7 +184,7 @@ Intuitionistic Type Theory is formalized through a set of inference rules that d
         ```
         If a term `a` has type `A`, and type `A` is definitionally equal to type `B`, then `a` also has type `B`. This ensures that typing respects definitional equality of types.
 
-These general rules, along with specific rules for each type constructor (like Π, Σ, ℕ, etc.), form the deductive system of ITT. Every rule of inference, from introducing logical connectives to applying functions, is expressed as a relationship between judgments, making the entire structure of reasoning explicit and formal. The nLab page on Martin-Löf dependent type theory also lists structural rules such as variable conversion and rules for definitional equality and definitions, which are crucial for the meta-theory .
+These general rules, along with specific rules for each type constructor (like Π, Σ, ℕ, etc.), form the deductive system of ITT. Every rule of inference, from introducing logical connectives to applying functions, is expressed as a relationship between judgments, making the entire structure of reasoning explicit and formal. The nLab page on Martin-Löf dependent type theory also lists structural rules such as variable conversion and rules for definitional equality and definitions, which are crucial for the meta-theory.
 
 ### 3.3 Universe Hierarchy (U_i)
 To avoid paradoxes like Russell's paradox (which arises from allowing a "type of all types" that contains itself), Intuitionistic Type Theory organizes types into a **hierarchy of universes**. Each universe `U_i` (or `Type_i`) is a type that contains other types. The subscript `i` is typically a natural number, indicating the level of the universe. The key rules for universes are:
