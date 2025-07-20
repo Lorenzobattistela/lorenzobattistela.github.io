@@ -167,6 +167,7 @@ export default function Home({ allPostsData }) {
           </p>
         </div>
 
+                <img src="/images/car_gif.gif" alt="Car GIF" className="car-gif" />
         <div className="posts-container">
           <h2>Posts</h2>
           <ul className="posts-list">
